@@ -32,7 +32,7 @@ class TriviaTestCase(unittest.TestCase):
         pass
 
     """
-    TODo
+    DONE
     Write at least one test for each test for successful operation and for expected errors.
     """
     def test_paginated_questions(self):
@@ -44,7 +44,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['questions'])
         self.assertTrue(data['total_questions'])
 
-    def test_category(self):
+    def test_categorized_questions(self):
 
         res = self.client().get('/categories/1/questions')
         # print('\n***************************\n',res,'\n***************************\n')
@@ -54,8 +54,9 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['questions'])
         self.assertTrue(data['total_length'])
         self.assertEqual(data['Category_name'],'Science')
-    
-    def test_question(self):
+       
+
+    def test_delete_question(self):
 
         req = self.client().delete('/questions/6')
         data = json.loads(req.data)
@@ -75,7 +76,28 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(d['questions'])
         self.assertTrue(d['question_length'])
 
+    def test_Search(self):
         
+        search =  self.client().post('/questions/search',json={"searchTerm":"what"})
+
+        results = json.loads(search.data) 
+        # print('\n**************************\n',results,'\n**************************\n')
+
+        self.assertAlmostEqual(search.status_code,200)
+        self.assertTrue(results['questions'])
+        self.assertTrue(results['total_length'])
+
+    def test_create_question(self):
+
+        req = self.client().post('/questions',json={"question":"how old are you?" , "answer":"fine", "difficulty":3,"category":2})
+
+        results = json.loads(req.data)
+
+        self.assertEqual(req.status_code,200)
+        self.assertTrue(results['Created'])
+        self.assertTrue(results['questions'])
+        self.assertTrue(results['total_questions'])
+
 
 
 # Make the tests conveniently executable
