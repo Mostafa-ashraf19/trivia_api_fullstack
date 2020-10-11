@@ -51,7 +51,7 @@ def create_app(test_config=None):
     return jsonify({
      'success':True,
      'categories': formatted_categories 
-    })
+    }),200
 
   '''
   DONE: 
@@ -94,14 +94,14 @@ def create_app(test_config=None):
       if question is None:
         abort(404)
       question.delete()
-      questions = Question.query.order_by(Question.id).all()
-      current_questions = paginate_questions(request,questions)
+      # questions = Question.query.order_by(Question.id).all()
+      # current_questions = paginate_questions(request,questions)
 
       return jsonify({
         'success':True,
         'deleted':id,
-        'questions':current_questions,
-        'total_questions':len(Question.query.all())
+        # 'questions':current_questions,
+        # 'total_questions':len(Question.query.all())
       }),200   
 
     except:    
@@ -121,13 +121,13 @@ def create_app(test_config=None):
   def create_question():
     body = request.get_json()
 
-    question_desc = body.get('question',None)
-    question_ans = body.get('answer',None)
-    question_diff = body.get('difficulty',None)
-    question_cat = body.get('category',None)
+    question_description = body.get('question',None)
+    question_answer = body.get('answer',None)
+    question_difficulty = body.get('difficulty',None)
+    question_category = body.get('category',None)
 
     try: 
-      question = Question(question_desc,question_ans,question_cat,question_diff)
+      question = Question(question_description,question_answer,question_category,question_difficulty)
       question.insert()
 
       questions = Question.query.all()
@@ -138,7 +138,7 @@ def create_app(test_config=None):
         'Created':question.id,
         'questions': current_questions,
         'total_questions': len(Question.query.all())
-      })
+      }),200
 
     except:  
       abort(422)
@@ -154,15 +154,12 @@ def create_app(test_config=None):
   only question that include that string within their question. 
   Try using the word "title" to start. 
   '''
-  @app.route('/questions',methods=['POST'])
+  @app.route('/questions/search',methods=['POST'])
   def Search():
     body = request.get_json()
-
-    question_desc = body.get('question',None)
-    question_ans = body.get('answer',None)
-    question_diff = body.get('difficulty',None)
-    question_cat = body.get('category',None)
+    # print('\n************ body is ***********\n',body,'\n***********************\n')
     search = body.get('searchTerm',None)
+    # print('\n***********************\n',search,'\n***********************\n')
     try: 
       if search: 
         question = Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(search))) 
@@ -171,7 +168,7 @@ def create_app(test_config=None):
           'success':True,
           'questions': current_questions,
           'total_questions':len(current_questions)
-        })
+        }),200
     except:
       abort(422)  
     
@@ -188,10 +185,7 @@ def create_app(test_config=None):
     
     category = Category.query.filter(Category.id == id).one_or_none()
     if category == None:
-      return jsonify({
-      'success':False,  
-      'Category_name':'Not Found this category', 
-    })
+      abort(404)
     category = category.format()
     categorized_questions = Question.query.filter(Question.category == category['id']).all()
     current_categorized_questions = paginate_questions(request,categorized_questions)
@@ -221,7 +215,10 @@ def create_app(test_config=None):
   def rand_play_Question():
     data = request.get_json()
 
-    questions =  Question.query.filter(Question.category == data['quiz_category']).filter(Question.id != data['previous_questions']).all()
+    # questions =  Question.query.filter(Question.category == data['quiz_category']).filter(Question.id != data['previous_questions']).all()
+    # questions =  Question.query.filter(Question.category == data['quiz_category']).filter(not(Question.id == (data['previous_questions']))).all()
+    questions =  Question.query.filter(Question.category == data['quiz_category']).filter(not(Question.id == data['previous_questions'])).all()
+    
     returned_questions = [ question.format() for question in questions]
 
     if len(returned_questions) == 0:
