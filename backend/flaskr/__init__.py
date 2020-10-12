@@ -67,19 +67,26 @@ def create_app(test_config=None):
   '''
   @app.route('/questions',methods=['GET'])
   def retrive_questions():
+    # print('\n************************\n',page,'\n*****************\n')
     questions = Question.query.order_by(Question.id).all()
 
     current_questions = paginate_questions(request,questions)
 
+
+    categories = Category.query.all()
+    formatted_categories = [ category.format()['id'] for category in categories ]
+    
     if len(current_questions) == 0:
       abort(404)
     return jsonify({
       'success':True,
       'questions':current_questions,
-      'total_questions':len(Question.query.all())
+      'total_questions':len(Question.query.all()),
+      'categories':formatted_categories,
+      'current_category':2  # I don't know what should set here !!!
     })
     
-  '''
+  ''' 
   DONE: 
   Create an endpoint to DELETE question using a question ID. 
 
