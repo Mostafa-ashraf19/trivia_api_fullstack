@@ -58,7 +58,7 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_delete_question(self):
 
-        req = self.client().delete('/questions/6')
+        req = self.client().delete('/questions/7')
         data = json.loads(req.data)
         # print('\n*****************************\n',data,'\n******************\n')
 
@@ -85,7 +85,7 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertAlmostEqual(search.status_code,200)
         self.assertTrue(results['questions'])
-        self.assertTrue(results['total_length'])
+        self.assertTrue(results['total_questions'])
 
     def test_create_question(self):
 
