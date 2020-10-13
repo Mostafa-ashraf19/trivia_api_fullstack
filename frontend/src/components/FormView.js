@@ -3,6 +3,8 @@ import $ from 'jquery';
 
 import '../stylesheets/FormView.css';
 
+// this in form view in .........../add
+
 class FormView extends Component {
   constructor(props){
     super();
@@ -63,6 +65,7 @@ class FormView extends Component {
     this.setState({[event.target.name]: event.target.value})
   }
 
+  // this section is /add
   render() {
     return (
       <div id="add-form">

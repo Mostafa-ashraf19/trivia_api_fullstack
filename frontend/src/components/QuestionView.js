@@ -5,6 +5,9 @@ import Question from './Question';
 import Search from './Search';
 import $ from 'jquery';
 
+
+//  this is ..................../ main route
+
 class QuestionView extends Component {
   constructor(){
     super();

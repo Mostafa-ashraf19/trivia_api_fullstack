@@ -3,6 +3,9 @@ import $ from 'jquery';
 
 import '../stylesheets/QuizView.css';
 
+
+// this is ................./play
+
 const questionsPerPlay = 5; 
 
 class QuizView extends Component {
