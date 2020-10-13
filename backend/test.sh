@@ -9,3 +9,6 @@ curl http://127.0.0.1:5000/questions
 printf "\n\n\n\n\n*********************************************\ntest\n*********************************************\n\n\n\n\n"
 curl -X DELETE http://127.0.0.1:5000/questions/8
 
+
+curl -X POST http://127.0.0.1:5000/questions/search -H "content-Type:application/json" -d '{"searchTerm":"what"}'
+
