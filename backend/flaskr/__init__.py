@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
 
+
 from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
@@ -44,7 +45,7 @@ def create_app(test_config=None):
   @app.route('/categories',methods=['GET'])
   def Categories():
     categories = Category.query.all()
-    formatted_categories = [ category.format() for category in categories ]
+    formatted_categories = [ category.format()['type'] for category in categories ]
     
     if len(formatted_categories) == 0: 
       abort(404)
@@ -72,9 +73,8 @@ def create_app(test_config=None):
 
     current_questions = paginate_questions(request,questions)
 
-
     categories = Category.query.all()
-    formatted_categories = [ category.format()['id'] for category in categories ]
+    formatted_categories = [ category.format()['type'] for category in categories ]
     
     if len(current_questions) == 0:
       abort(404)
@@ -83,7 +83,7 @@ def create_app(test_config=None):
       'questions':current_questions,
       'total_questions':len(Question.query.all()),
       'categories':formatted_categories,
-      'current_category':2  # I don't know what should set here !!!
+      'current_category':1  # I don't know what should set here !!!
     })
     
   ''' 
@@ -174,7 +174,8 @@ def create_app(test_config=None):
         return jsonify({
           'success':True,
           'questions': current_questions,
-          'total_questions':len(current_questions)
+          'total_questions':len(current_questions),
+          'current_category':None
         }),200
     except:
       abort(422)  
@@ -202,8 +203,10 @@ def create_app(test_config=None):
     return jsonify({
       'success':True,
       'questions':current_categorized_questions,  
-      'Category_name':category['type'], 
-      'total_length': len(current_categorized_questions)
+      'current_category':category['type'], 
+      'total_questions': len(current_categorized_questions)
+      # 'Category_name':category['type'], 
+      # 'total_length': len(current_categorized_questions)
     }),200  
 
 
@@ -220,21 +223,33 @@ def create_app(test_config=None):
   '''
   @app.route('/quizzes',methods=['POST'])
   def rand_play_Question():
-    data = request.get_json()
-
-    # questions =  Question.query.filter(Question.category == data['quiz_category']).filter(Question.id != data['previous_questions']).all()
-    # questions =  Question.query.filter(Question.category == data['quiz_category']).filter(not(Question.id == (data['previous_questions']))).all()
-    questions =  Question.query.filter(Question.category == data['quiz_category']).filter(not(Question.id == data['previous_questions'])).all()
     
-    returned_questions = [ question.format() for question in questions]
+    try:
+      data = request.get_json()
 
-    if len(returned_questions) == 0:
-      abort(404)
-    return jsonify({
-      'success':True,
-      'questions':returned_questions,
-      'question_length':len(returned_questions)
-    })  
+      
+      # questions =  Question.query.filter(Question.category == data['quiz_category']).filter(Question.id != data['previous_questions']).all()
+      # questions =  Question.query.filter(Question.category == data['quiz_category']).filter(not(Question.id == (data['previous_questions']))).all()
+      # data['quiz_category']['id']+=1
+      # print('\n********************\n',data,'\n********************\n')
+      # print('\n********************\n',type(data['quiz_category']['id']),'    ', data['previous_questions'],'\n********************\n')
+      
+      value = int(data['quiz_category']['id']) +1  #str((int(data['quiz_category']['id'])+1))
+      data['quiz_category']['id']  = str(value)  
+      questions =  Question.query.filter(Question.category == data['quiz_category']['id']).filter(not(Question.id == data['previous_questions'])).all()
+      returned_questions = [ question.format() for question in questions]
+      # print('\n********************\n',returned_questions,'\n********************\n')
+
+      randval =  random.randint(0,(len(returned_questions)-1))
+      question = returned_questions[randval]
+      if len(returned_questions) == 0:
+        abort(404)
+      return jsonify({
+        'success':True,
+        'question':question,
+      }),200 
+    except:
+      abort(500)  
 
   '''
   DONE: 
